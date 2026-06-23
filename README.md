@@ -79,3 +79,31 @@ No installation or build steps are necessary to run this project locally.
 
 - **Preset Declarations:** Theme settings can be found in `script.js` under the `presets` object. Adding a new brand requires declaring `dotsOptions`, `cornersSquareOptions`, `cornersDotOptions`, and optional center logo graphics.
 - **Custom Canvas Layouts:** Frame drawing math is detailed within the `drawFrame()` method in `script.js`.
+
+---
+
+## 🌐 Deployment
+
+Since **QR Studio** is a client-side static web application (HTML, CSS, JS), it can be deployed on the web for free in seconds.
+
+### Option 1: GitHub Pages (Recommended)
+If your code is hosted on GitHub:
+1. Go to your repository on GitHub.
+2. Navigate to **Settings** > **Pages** (under the "Code and automation" section).
+3. Under **Build and deployment**, set the source to **Deploy from a branch**.
+4. Choose your branch (usually `main` or `master`) and select `/ (root)` folder.
+5. Click **Save**. Your site will be live at `https://<username>.github.io/<repository-name>/` within a couple of minutes!
+
+### Option 2: Netlify (Drag & Drop or Git)
+- **Drag & Drop:**
+  1. Go to [Netlify Drop](https://app.netlify.com/drop).
+  2. Drag and drop your local project folder (`QR_Genrator` / `QR-Studio`) directly into the upload area.
+  3. It will deploy instantly!
+- **Git Integration:** Connect your GitHub repository to Netlify for automatic deployments whenever you push changes.
+
+### Option 3: Vercel
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run `vercel` in your project directory.
+3. Follow the prompts to deploy.
+Alternatively, connect your repository to [Vercel Dashboard](https://vercel.com) for auto-deployments.
+
