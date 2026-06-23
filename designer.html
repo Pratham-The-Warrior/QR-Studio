@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>QR Designer — QR Studio</title>
+    <meta name="description" content="Design your custom QR code." />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf8ff;
+            color: #131b2e;
+            overflow-x: hidden;
+        }
+
+        .headline-font {
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+
+        .glass-panel {
+            background: #ffffff;
+            border: 1px solid #eaedff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .glass-panel-heavy {
+            background: #ffffff;
+            border: 1px solid #e2e7ff;
+            box-shadow: 0 20px 25px -5px rgba(70, 72, 212, 0.1), 0 10px 10px -5px rgba(70, 72, 212, 0.04);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Pill & Chip custom override styles */
+        .pill.active {
+            background-color: #4648d4 !important;
+            color: #ffffff !important;
+            border-color: #4648d4 !important;
+        }
+
+        #qr-canvas canvas {
+            max-width: 100% !important;
+            max-height: 240px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#4648d4",
+                        "secondary": "#006c49",
+                        "surface": "#faf8ff",
+                        "on-surface": "#131b2e",
+                        "on-surface-variant": "#464554",
+                        "outline-variant": "#c7c4d7",
+                        "primary-container": "#6063ee",
+                        "secondary-container": "#6cf8bb",
+                        "on-secondary-container": "#00714d",
+                        "surface-container": "#eaedff",
+                        "surface-container-low": "#f2f3ff",
+                        "surface-container-high": "#e2e7ff"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen">
+    <!-- Top AppBar -->
+    <header
+        class="fixed top-0 w-full z-30 bg-surface/80 backdrop-blur-xl border-b border-outline-variant shadow-sm flex justify-between items-center px-4 md:px-8 h-16">
+        <div class="flex items-center gap-4">
+            <a href="index.html"
+                class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div class="flex flex-col">
+                <h1 class="text-lg font-bold text-on-surface headline-font leading-tight">QR Designer</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div
+                class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+                <img alt="User Profile" class="w-full h-full object-cover"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8jAOTI3CDiBe5M9C5uasfXwYx7xMYRLgAE_0feM6Z30EIXPyvj_C9u8kcKJvuyHu52eRQDEsB-uJ-a7Ff7q0ckXTH5hUk0AmYWa3zUmfCxYE5j_CsoYY253of2HKRxOoz50NaLBMwen1GLZAnHYCWqnwT2cI0kPD49tVD9ltV6yq0jC7VxP4NfLFlUqNgscqV_vg8ROGYzMi4DYwc9HV6TaSaXsqEa8f_FiUKQdhG8u9Kfwz51mpNg2Sb4Ur07u77JEVowhp4ebI" />
+            </div>
+        </div>
+    </header>
+
+    <main id="designer-container" class="pt-24 px-4 md:px-8 md:max-w-[1400px] md:mx-auto pb-16">
+
+        <!-- Data Input Section -->
+        <div class="glass-panel p-6 rounded-3xl mb-8">
+            <div class="flex flex-col gap-2">
+                <label
+                    class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5"
+                    for="qr-data-input">
+                    <span class="material-symbols-outlined text-base text-primary">link</span>
+                    Content URL or Text
+                </label>
+                <input id="qr-data-input" type="text" placeholder="Paste a URL or type text..."
+                    class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder-slate-400"
+                    autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Left Column: Controls -->
+            <div class="lg:col-span-8 flex flex-col gap-8">
+
+                <!-- Styling Options Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Dot Pattern -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col gap-4">
+                        <label
+                            class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-primary">grid_on</span>
+                            Dot Pattern
+                        </label>
+                        <div id="dot-style-picker" class="flex flex-wrap gap-2">
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full active transition-all"
+                                data-value="rounded">Rounded</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="dots">Circle</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="square">Square</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="classy">Classy</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="classy-rounded">Smooth</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="extra-rounded">Blob</button>
+                        </div>
+                    </div>
+
+                    <!-- Corner Eyes -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col gap-4">
+                        <label
+                            class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-primary">border_outer</span>
+                            Corner Eyes
+                        </label>
+                        <div id="corner-style-picker" class="flex flex-wrap gap-2">
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full active transition-all"
+                                data-value="square">Square</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="dot">Circle</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="extra-rounded">Rounded</button>
+                        </div>
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col gap-4">
+                        <label
+                            class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-primary">palette</span>
+                            Colors
+                        </label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="flex flex-col items-center gap-1">
+                                <input type="color" id="dot-color" value="#4648d4"
+                                    class="w-12 h-12 rounded-xl border border-slate-200 p-0.5 cursor-pointer" />
+                                <span class="text-xs text-slate-500 font-medium">Dots</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <input type="color" id="corner-color" value="#4648d4"
+                                    class="w-12 h-12 rounded-xl border border-slate-200 p-0.5 cursor-pointer" />
+                                <span class="text-xs text-slate-500 font-medium">Corners</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <input type="color" id="bg-color" value="#ffffff"
+                                    class="w-12 h-12 rounded-xl border border-slate-200 p-0.5 cursor-pointer" />
+                                <span class="text-xs text-slate-500 font-medium">Background</span>
+                            </div>
+                        </div>
+
+                        <label class="flex items-center gap-2 cursor-pointer mt-2">
+                            <input type="checkbox" id="use-gradient"
+                                class="rounded border-slate-300 text-primary focus:ring-primary/20 w-4 h-4" />
+                            <span class="text-sm text-slate-600 font-medium select-none">Use gradient for dots</span>
+                        </label>
+
+                        <div id="gradient-controls" class="grid grid-cols-2 gap-4 hidden mt-2">
+                            <div class="flex flex-col items-center gap-1">
+                                <input type="color" id="gradient-color-1" value="#4648d4"
+                                    class="w-full h-10 rounded-xl border border-slate-200 p-0.5 cursor-pointer" />
+                                <span class="text-xs text-slate-500 font-medium">From</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <input type="color" id="gradient-color-2" value="#a12e70"
+                                    class="w-full h-10 rounded-xl border border-slate-200 p-0.5 cursor-pointer" />
+                                <span class="text-xs text-slate-500 font-medium">To</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Logo -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col gap-4">
+                        <label
+                            class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-primary">image</span>
+                            Center Logo
+                        </label>
+                        <div id="logo-upload-area"
+                            class="h-full min-h-[120px] border-2 border-dashed border-slate-200 hover:border-primary hover:bg-primary/5 rounded-xl cursor-pointer transition-all p-5 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-primary">
+                            <input type="file" id="logo-upload" accept="image/*" class="hidden" />
+                            <div id="upload-placeholder" class="flex flex-col items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-3xl">upload_file</span>
+                                <span class="text-sm font-medium">Upload logo image</span>
+                            </div>
+                            <div id="upload-preview" class="hidden relative flex items-center justify-center">
+                                <img id="logo-preview-img" alt="Logo"
+                                    class="max-w-[80px] max-h-[80px] rounded-lg object-contain shadow-sm border border-slate-100" />
+                                <button id="remove-logo"
+                                    class="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-600 transition-colors shadow">
+                                    <span class="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Frame -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col gap-4 md:col-span-2">
+                        <label
+                            class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base text-primary">crop_free</span>
+                            Custom Frame
+                        </label>
+                        <div id="frame-style-picker" class="flex flex-wrap gap-2">
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full active transition-all"
+                                data-value="none">None</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="classic">Classic</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="minimal">Minimal</button>
+                            <button
+                                class="pill px-4 py-2 text-sm font-medium bg-slate-100 hover:bg-primary/5 hover:text-primary border border-slate-200 rounded-full transition-all"
+                                data-value="badge">Badge</button>
+                        </div>
+
+                        <div id="frame-details-panel"
+                            class="p-5 bg-slate-50 border border-slate-100 rounded-xl space-y-4 hidden mt-2">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <div class="flex flex-col gap-1.5">
+                                        <span class="text-xs font-bold text-slate-500 uppercase">Top Banner Text</span>
+                                        <input type="text" id="frame-top-text" value="FOLLOW US!"
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-primary transition-all placeholder-slate-400"
+                                            autocomplete="off" />
+                                    </div>
+                                    <div class="flex flex-col gap-1.5">
+                                        <span class="text-xs font-bold text-slate-500 uppercase">Bottom Text</span>
+                                        <input type="text" id="frame-text" value="SCAN ME!"
+                                            class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-primary transition-all placeholder-slate-400"
+                                            autocomplete="off" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div
+                                        class="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-100 rounded-xl">
+                                        <input type="color" id="frame-color" value="#4648d4"
+                                            class="w-12 h-12 rounded-lg border border-slate-200 p-0.5 cursor-pointer" />
+                                        <span class="text-xs text-slate-500 font-medium">Frame Color</span>
+                                    </div>
+                                    <div
+                                        class="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-100 rounded-xl">
+                                        <input type="color" id="frame-text-color" value="#ffffff"
+                                            class="w-12 h-12 rounded-lg border border-slate-200 p-0.5 cursor-pointer" />
+                                        <span class="text-xs text-slate-500 font-medium">Text Color</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Preview & Output (Sticky) -->
+            <div class="lg:col-span-4 relative">
+                <div class="lg:sticky lg:top-24 glass-panel-heavy rounded-3xl p-6 flex flex-col gap-6">
+
+                    <!-- QR Preview Stage -->
+                    <div
+                        class="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-200 relative min-h-[320px] overflow-hidden">
+                        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+                            style="background-image: radial-gradient(#000 10%, transparent 11%); background-size: 16px 16px;">
+                        </div>
+                        <div id="qr-canvas" class="relative z-10 flex items-center justify-center transform scale-110">
+                        </div>
+                        <p id="preview-hint" class="text-sm text-slate-400 absolute">Your QR code will appear here</p>
+                    </div>
+
+                    <!-- Size -->
+                    <div class="flex flex-col gap-2 px-2">
+                        <label
+                            class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between"
+                            for="qr-size">
+                            <span class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-sm text-primary">aspect_ratio</span>
+                                Export Size
+                            </span>
+                            <span class="text-slate-500 font-mono text-xs bg-slate-100 px-2 py-0.5 rounded-md"><span
+                                    id="size-value-label">1024</span>px</span>
+                        </label>
+                        <input type="range" id="qr-size" min="500" max="2000" value="1024" step="100"
+                            class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none mt-2" />
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="btn-generate"
+                        class="w-full py-4 mt-2 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 text-base">
+                        <span class="material-symbols-outlined">flash_on</span>
+                        Generate QR-Code
+                    </button>
+
+                    <!-- Export Actions -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <button id="btn-download-png"
+                            class="py-3 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-primary hover:border-primary font-semibold rounded-xl flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                            disabled>
+                            <span
+                                class="material-symbols-outlined text-lg group-hover:-translate-y-0.5 transition-transform">image</span>
+                            <span class="text-[11px] uppercase tracking-wider">PNG</span>
+                        </button>
+                        <button id="btn-download-svg"
+                            class="py-3 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-primary hover:border-primary font-semibold rounded-xl flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                            disabled>
+                            <span
+                                class="material-symbols-outlined text-lg group-hover:-translate-y-0.5 transition-transform">polyline</span>
+                            <span class="text-[11px] uppercase tracking-wider">SVG</span>
+                        </button>
+                        <button id="btn-share"
+                            class="py-3 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-primary hover:border-primary font-semibold rounded-xl flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                            disabled>
+                            <span
+                                class="material-symbols-outlined text-lg group-hover:-translate-y-0.5 transition-transform">ios_share</span>
+                            <span class="text-[11px] uppercase tracking-wider">Share</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="qr-code-styling.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
