@@ -2,6 +2,8 @@
 
 QR Studio is a premium, web-based utility for designing and generating highly customized, production-ready QR codes. Crafted with modern design principles (Glassmorphism, custom typography, and fluid responsive grids), it enables creators and brands to align QR codes perfectly with their visual identity in seconds.
 
+It is a improvement of my Basic API-Based QR-Code Generator I had made during Javascript Course `https://github.com/Pratham-The-Warrior/Projects-JS`
+
 ---
 
 ## 📸 Interface Preview
